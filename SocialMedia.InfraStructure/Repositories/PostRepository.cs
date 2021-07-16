@@ -21,18 +21,21 @@ namespace SocialMedia.InfraStructure.Repositories
 
         public async Task<IEnumerable<Post>> GetPosts()
         {
-            //var posts = Enumerable.Range(1, 10).Select(x => new Post
-            //{
-            //    PostId = x,
-            //    Description = $"Description {x}",
-            //    Date = DateTime.UtcNow,
-            //    Image = $"https://misapis.com/{x}",
-            //    UserId = x * 2
-            //});
-
             var posts = await _context.Posts.ToArrayAsync();
 
             return posts;
+        }
+
+        public async Task<Post> GetPost(int id)
+        {
+            var post = await _context.Posts.FirstOrDefaultAsync(e=> e.UserId == id);
+            return post;
+        }
+
+        public async Task InsertPost(Post post)
+        {
+            _context.Posts.Add(post);
+            await _context.SaveChangesAsync();
         }
     }
 }

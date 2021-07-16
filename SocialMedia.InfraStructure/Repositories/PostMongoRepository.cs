@@ -8,9 +8,14 @@ using System.Threading.Tasks;
 
 namespace SocialMedia.InfraStructure.Repositories
 {
-    public class PostMongoRepository : IPostRepository
+    public class PostMongoRepository
     {
-        Task<IEnumerable<Post>> IPostRepository.GetPosts()
+        public Task<Post> GetPost(int id)
+        {
+            throw new NotImplementedException();
+        }
+
+        public Task<IEnumerable<Post>> GetPosts()
         {
             throw new NotImplementedException();
         }
