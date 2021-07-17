@@ -7,6 +7,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.OpenApi.Models;
 using SocialMedia.Core.Interfaces;
+using SocialMedia.Core.Services;
 using SocialMedia.InfraStructure.Data;
 using SocialMedia.InfraStructure.Filters;
 using SocialMedia.InfraStructure.Repositories;
@@ -30,14 +31,13 @@ namespace SocialMedia.API
             services.AddControllers().AddNewtonsoftJson(options =>
             {
                 options.SerializerSettings.ReferenceLoopHandling = Newtonsoft.Json.ReferenceLoopHandling.Ignore;
-            })
-                .ConfigureApiBehaviorOptions(options=>
-                {
-                    options.SuppressModelStateInvalidFilter = true;
-                });
+            });
+
             services.AddDbContext<SocialMediaContext>(options =>
                         options.UseSqlServer(Configuration.GetConnectionString("SocialMedia")));
-            services.AddTransient<IPostRepository, PostRepository>();
+            services.AddTransient<IPostService, PostService>();
+            services.AddScoped(typeof(IRepository<>), typeof(BaseRepository<>));
+            services.AddScoped<IUnitOfWork, UnitOfWork>();
 
             services.AddSwaggerGen(c =>
             {

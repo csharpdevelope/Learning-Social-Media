@@ -28,7 +28,7 @@ namespace SocialMedia.InfraStructure.Repositories
 
         public async Task<Post> GetPost(int id)
         {
-            var post = await _context.Posts.FirstOrDefaultAsync(e=> e.UserId == id);
+            var post = await _context.Posts.FirstOrDefaultAsync(e=> e.Id == id);
             return post;
         }
 
@@ -36,6 +36,27 @@ namespace SocialMedia.InfraStructure.Repositories
         {
             _context.Posts.Add(post);
             await _context.SaveChangesAsync();
+        }
+
+        public async Task<bool> UpdatePostAsync(Post post)
+        {
+            var currentPost = await GetPost(post.Id);
+            currentPost.Date = post.Date;
+            currentPost.Description = post.Description;
+            currentPost.Image = post.Image;
+            currentPost.UserId = post.UserId;
+
+            int rows = await _context.SaveChangesAsync();
+            return rows > 0;
+        }
+
+        public async Task<bool> DeletePost(int id)
+        {
+            var current = await GetPost(id);
+
+            _context.Posts.Remove(current);
+            int rows = await _context.SaveChangesAsync();
+            return rows > 0;
         }
     }
 }
