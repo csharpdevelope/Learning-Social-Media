@@ -5,10 +5,12 @@ using SocialMedia.API.Response;
 using SocialMedia.Core.DTOs;
 using SocialMedia.Core.Entities;
 using SocialMedia.Core.Interfaces;
+using SocialMedia.Core.QueryFilter;
 using SocialMedia.InfraStructure.Repositories;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Net;
 using System.Threading.Tasks;
 
 namespace SocialMedia.API.Controllers
@@ -28,14 +30,16 @@ namespace SocialMedia.API.Controllers
         }
 
         [HttpGet]
-        public IActionResult GetPostsAsync()
+        [ProducesResponseType((int)HttpStatusCode.OK)]
+        [ProducesResponseType((int)HttpStatusCode.BadRequest)]
+        public IActionResult GetPostsAsync([FromQuery] PostQueryFilter filter)
         {
-            var posts = _postService.GetPosts();
+            var posts = _postService.GetPosts(filter);
             var postDto = _mapper.Map<IEnumerable<PostDto>>(posts);
             var response = new ApiResponse<IEnumerable<PostDto>>(postDto);
             return Ok(response);
         }
-
+        
         [HttpGet("{id}")]
         public async Task<IActionResult> GetPostAsync([FromRoute] int id)
         {
