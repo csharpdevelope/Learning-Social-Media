@@ -1,4 +1,5 @@
 ﻿using SocialMedia.Core.Entities;
+using SocialMedia.Core.Exceptions;
 using SocialMedia.Core.Interfaces;
 using System;
 using System.Collections.Generic;
@@ -15,6 +16,7 @@ namespace SocialMedia.Core.Services
         public PostService(IUnitOfWork unitOfWork)
         {
             _unitOfWork = unitOfWork;
+
         }
 
         public async Task<bool> DeletePost(int id)
@@ -23,9 +25,9 @@ namespace SocialMedia.Core.Services
             return true;
         }
 
-        public async Task<IEnumerable<Post>> GetPosts()
+        public IEnumerable<Post> GetPosts()
         {
-            return await _unitOfWork.PostRepository.GetAll();
+            return _unitOfWork.PostRepository.GetAll();
         }
 
         public async Task<Post> GetPost(int id)
@@ -40,15 +42,28 @@ namespace SocialMedia.Core.Services
 
             if (user == null)
             {
-                throw new Exception("User doesn't exist");
+                throw new BusinessException("User doesn't exist");
+            }
+            var userPost = await _unitOfWork.PostRepository.GetPostByUser(post.UserId);
+            if (userPost.Count() < 10)
+            {
+                var lastPost = userPost.OrderByDescending(x=>x.Date).LastOrDefault();
+                if ((lastPost.Date - DateTime.Now).TotalDays < 7)
+                {
+                    throw new BusinessException("You are not able to publish the post"); 
+                }
             }
 
+            if (post.Description.Contains("Sexo"))
+                throw new BusinessException("Content not allowed");
+
             await _unitOfWork.PostRepository.Add(post);
+            await _unitOfWork.SaveChangesAsync();
         }
 
-        public async Task<bool> UpdatePost(Post post)
+        public bool UpdatePost(Post post)
         {
-            await _unitOfWork.PostRepository.Update(post);
+            _unitOfWork.PostRepository.Update(post);
             return true;
         }
     }

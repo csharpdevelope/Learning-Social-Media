@@ -13,16 +13,16 @@ namespace SocialMedia.InfraStructure.Repositories
     public class BaseRepository<T> : IRepository<T> where T : BaseEntity
     {
         private readonly SocialMediaContext _context;
-        private readonly DbSet<T> _entites;
+        protected readonly DbSet<T> _entites;
         public BaseRepository(SocialMediaContext context)
         {
             _context = context;
             _entites = _context.Set<T>();
         }
 
-        public async Task<IEnumerable<T>> GetAll()
+        public IEnumerable<T> GetAll()
         {
-            return await _entites.ToArrayAsync();
+            return _entites.AsEnumerable();
         }
 
         public async Task<T> GetById(int id)
@@ -30,10 +30,9 @@ namespace SocialMedia.InfraStructure.Repositories
             return await _entites.FindAsync(id);
         }
 
-        public async Task Update(T entity)
+        public void Update(T entity)
         {
             _entites.Update(entity);
-            await _context.SaveChangesAsync();
         }
 
         public async Task Add(T entity)
