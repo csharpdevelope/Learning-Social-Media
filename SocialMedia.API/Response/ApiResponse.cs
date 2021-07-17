@@ -1,4 +1,5 @@
-﻿using SocialMedia.Core.DTOs;
+﻿using SocialMedia.Core.CustomEntity;
+using SocialMedia.Core.DTOs;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -16,5 +17,6 @@ namespace SocialMedia.API.Response
         }
 
         public T Data { get; set; }
+        public MetaData Meta { get; set; }
     }
 }

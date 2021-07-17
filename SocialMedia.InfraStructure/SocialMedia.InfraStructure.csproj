@@ -20,4 +20,8 @@
     <ProjectReference Include="..\SocialMedia.Core\SocialMedia.Core.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Folder Include="Options\" />
+  </ItemGroup>
+
 </Project>
