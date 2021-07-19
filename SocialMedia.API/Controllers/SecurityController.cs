@@ -5,6 +5,7 @@ using SocialMedia.API.Response;
 using SocialMedia.Core.DTOs;
 using SocialMedia.Core.Entities;
 using SocialMedia.Core.Interfaces;
+using SocialMedia.InfraStructure.Interfaces;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -19,17 +20,20 @@ namespace SocialMedia.API.Controllers
     {
         private readonly ISecurityService _serviceService;
         private readonly IMapper _mapper;
+        private readonly IPasswordService _passwordService;
 
-        public SecurityController(ISecurityService serviceService, IMapper mapper)
+        public SecurityController(ISecurityService serviceService, IMapper mapper, IPasswordService passwordService)
         {
             _serviceService = serviceService;
             _mapper = mapper;
+            _passwordService = passwordService;
         }
 
         [HttpPost]
         public async Task<IActionResult> InsertPost([FromBody] SecurityDto securityDto)
         {
             var post = _mapper.Map<Security>(securityDto);
+            post.Password = _passwordService.Hash(post.Password);
             await _serviceService.RegisterUser(post);
 
             securityDto = _mapper.Map<SecurityDto>(post);

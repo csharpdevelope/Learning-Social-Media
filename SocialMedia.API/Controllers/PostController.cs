@@ -7,6 +7,7 @@ using SocialMedia.API.Response;
 using SocialMedia.Core.CustomEntity;
 using SocialMedia.Core.DTOs;
 using SocialMedia.Core.Entities;
+using SocialMedia.Core.Enumerations;
 using SocialMedia.Core.Interfaces;
 using SocialMedia.Core.QueryFilter;
 using SocialMedia.InfraStructure.Interfaces;
@@ -19,7 +20,7 @@ using System.Threading.Tasks;
 
 namespace SocialMedia.API.Controllers
 {
-    [Authorize]
+    [Authorize(Roles = nameof(RoleType.Administrator))]
     [Route("api/[controller]")]
     [ApiController]
     public class PostController : ControllerBase

@@ -6,9 +6,10 @@ using System.Threading.Tasks;
 
 namespace SocialMedia.InfraStructure.Options
 {
-    public class PaginationOptions
+    public class PasswordOptions
     {
-        public int DefaultPageSize { get; set; }
-        public int DefaultPageNumber { get; set; }
+        public int SaltSize { get; set; }
+        public int KeySize { get; set; }
+        public int Iterations { get; set; }
     }
 }
