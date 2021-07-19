@@ -12,7 +12,7 @@ using Microsoft.OpenApi.Models;
 using SocialMedia.Core.CustomEntity;
 using SocialMedia.Core.Interfaces;
 using SocialMedia.Core.Services;
-using SocialMedia.InfraStructure.Data;
+using SocialMedia.InfraStructure.Extensions;
 using SocialMedia.InfraStructure.Filters;
 using SocialMedia.InfraStructure.Interfaces;
 using SocialMedia.InfraStructure.Options;
@@ -42,53 +42,22 @@ namespace SocialMedia.API
             }).AddNewtonsoftJson(options =>
             {
                 options.SerializerSettings.ReferenceLoopHandling = Newtonsoft.Json.ReferenceLoopHandling.Ignore;
-                options.SerializerSettings.NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore;
             });
 
-            services.Configure<PaginationOptions>(Configuration.GetSection("Pagination"));
-            services.Configure<PasswordOptions>(Configuration.GetSection("PasswordOptions"));
+            services.AddOptions(Configuration);
+            services.AddDbContexts(Configuration);
+            services.AddServices();
 
-            services.AddDbContext<SocialMediaContext>(options =>
-                        options.UseSqlServer(Configuration.GetConnectionString("SocialMedia")));
-            services.AddTransient<IPostService, PostService>();
-            services.AddScoped(typeof(IRepository<>), typeof(BaseRepository<>));
-            services.AddScoped<IUnitOfWork, UnitOfWork>();
-            services.AddSingleton<IPasswordService, PasswordService>();
-            services.AddSingleton<IUriService>(provider =>
-            {
-                var accessor = provider.GetRequiredService<IHttpContextAccessor>();
-                var request = accessor.HttpContext.Request;
-                var absoluteUri = string.Concat(request.Scheme, "://", request.Host.ToUriComponent());
-                return new UriService(absoluteUri);
-            });
-            services.AddTransient<ISecurityService, SecurityService>();
-
+            //Swagger
             services.AddSwaggerGen(c =>
             {
                 c.SwaggerDoc("v1", new OpenApiInfo { Title = "SocialMedia.API", Version = "v1" });
             });
 
             //Authentication
-            services.AddAuthentication(options =>
-            {
-                options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
-                options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
-            }).AddJwtBearer(option =>
-            {
-                option.TokenValidationParameters = new TokenValidationParameters
-                {
-                    ValidateAudience = true,
-                    ValidateIssuer = true,
-                    ValidateLifetime = true,
-                    ValidateIssuerSigningKey = true,
-                    ValidIssuer = Configuration["Authentication:Issuer"],
-                    ValidAudience = Configuration["Authentication:Audience"],
-                    IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(Configuration["Authentication:SecretKey"]))
-                };
-            });
+            services.AddJwtAuthenticationServices(Configuration);
 
             //Adding Fluent Validation
-
             services.AddMvc(options =>
             {
                 options.Filters.Add<ValidationFilter>();
