@@ -1,12 +1,10 @@
-﻿using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
 using Microsoft.IdentityModel.Tokens;
 using SocialMedia.Core.Entities;
+using SocialMedia.Core.Interfaces;
 using System;
-using System.Collections.Generic;
 using System.IdentityModel.Tokens.Jwt;
-using System.Linq;
 using System.Security.Claims;
 using System.Text;
 using System.Threading.Tasks;
@@ -18,29 +16,33 @@ namespace SocialMedia.API.Controllers
     public class TokenController : ControllerBase
     {
         private readonly IConfiguration _configuration;
+        private readonly ISecurityService _securityService;
 
-        public TokenController(IConfiguration configuration)
+        public TokenController(IConfiguration configuration, ISecurityService securityService)
         {
             _configuration = configuration;
+            _securityService = securityService;
         }
 
         [HttpPost]
-        public IActionResult Authenticate(UserLogin login)
+        public async Task<IActionResult> AuthenticateAsync(UserLogin login)
         {
-            if (IsValidUser(login))
+            var validation = await IsValidUserAsync(login);
+            if (validation.Item1) 
             {
-                var token = GenerateToken();
+                var token = GenerateToken(validation.Item2);
                 return Ok(new { token });
             }
             return NotFound();
         }
 
-        private bool IsValidUser(UserLogin login)
+        private async Task<(bool, Security)> IsValidUserAsync(UserLogin login)
         {
-            return true;
+            var user = await _securityService.GetLoginCredentials(login);
+            return (user != null, user);
         }
 
-        private string GenerateToken()
+        private string GenerateToken(Security security)
         {
             //headers
             var _symmetricSecurityKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_configuration["Authentication:SecretKey"]));
@@ -50,9 +52,9 @@ namespace SocialMedia.API.Controllers
             //Claims
             var claims = new[]
             {
-                new Claim(ClaimTypes.Name, "Jonathan Estrada"),
-                new Claim(ClaimTypes.Email, "jestre@gmail.com"),
-                new Claim(ClaimTypes.Role, "Administrator")
+                new Claim(ClaimTypes.Name, security.Username),
+                new Claim("User", security.User),
+                new Claim(ClaimTypes.Role, security.Role.ToString())
             };
 
             //payload

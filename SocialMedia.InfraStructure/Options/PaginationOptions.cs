@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace SocialMedia.Core.CustomEntity
+namespace SocialMedia.InfraStructure.Options
 {
     public class PaginationOptions
     {

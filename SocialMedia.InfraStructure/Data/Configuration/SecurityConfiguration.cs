@@ -21,7 +21,7 @@ namespace SocialMedia.InfraStructure.Data.Configuration
                 .HasColumnName("SecurityId");
 
             builder.Property(e => e.User)
-            .HasColumnName("User")
+            .HasColumnName("Users")
                 .IsRequired()
                 .HasMaxLength(50)
                 .IsUnicode(false);
@@ -40,7 +40,7 @@ namespace SocialMedia.InfraStructure.Data.Configuration
 
             builder.Property(e => e.Role)
             .HasColumnName("Rol")
-                .HasMaxLength(15)
+                .HasMaxLength(25)
                 .IsUnicode(false)
                 .HasConversion(
                 x=>x.ToString(), x=> (RoleType)Enum.Parse(typeof(RoleType), x));

@@ -58,6 +58,7 @@ namespace SocialMedia.API
                 var absoluteUri = string.Concat(request.Scheme, "://", request.Host.ToUriComponent());
                 return new UriService(absoluteUri);
             });
+            services.AddTransient<ISecurityService, SecurityService>();
 
             services.AddSwaggerGen(c =>
             {
